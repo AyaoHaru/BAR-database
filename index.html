@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Points Redemption</title>
+</head>
+<body>
+  <h2>Welcome to the Reward Center</h2>
+
+  <label>User ID: <input type="text" id="userID"></label>
+  <button onclick="checkPoints()">Check My Points</button>
+
+  <div id="status"></div>
+
+  <div id="redeemSection" style="display:none;">
+    <p>Remaining Points: <span id="pointsDisplay">0</span></p>
+    <p>Owned Items: A = <span id="currentA">0</span>, B = <span id="currentB">0</span></p>
+
+    <label>Change in A (10 pts each, negative to sell): 
+      <input type="number" id="itemA" value="0">
+    </label><br>
+
+    <label>Change in B (5 pts each, negative to sell): 
+      <input type="number" id="itemB" value="0">
+    </label><br>
+
+    <button onclick="redeem()">Submit</button>
+  </div>
+
+  <script>
+    let userData = null;
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyzgjAI5OAeJ3enq9s-XSVvfQKbBP3ecS-ka3xqGPyTD0Xm3KI7-iaT7T97pRGOXzm1/exec'; // 替换为部署后的链接
+
+    function checkPoints() {
+      const id = document.getElementById('userID').value.trim();
+      fetch(`${scriptURL}?action=get&userID=${id}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            userData = data;
+            document.getElementById('pointsDisplay').innerText = data.points;
+            document.getElementById('currentA').innerText = data.A;
+            document.getElementById('currentB').innerText = data.B;
+            document.getElementById('redeemSection').style.display = 'block';
+            document.getElementById('status').innerText = '';
+          } else {
+            document.getElementById('status').innerText = 'User ID not found';
+          }
+        });
+    }
+
+    function redeem() {
+      const deltaA = parseInt(document.getElementById('itemA').value);
+      const deltaB = parseInt(document.getElementById('itemB').value);
+      const cost = deltaA * 10 + deltaB * 5;
+      const newPoints = userData.points - cost;
+      const newA = userData.A + deltaA;
+      const newB = userData.B + deltaB;
+
+      if (newA < 0 || newB < 0 || newPoints < 0) {
+        alert('Invalid redemption. Check your values!');
+        return;
+      }
+
+      const postData = {
+        userID: userData.userID,
+        A: deltaA,
+        B: deltaB
+      };
+
+      fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(postData),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Transaction successful!');
+          location.reload();
+        } else {
+          alert('Failed: ' + (data.reason || 'Unknown error'));
+        }
+      });
+    }
+  </script>
+</body>
+</html>
