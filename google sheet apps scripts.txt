@@ -1,0 +1,54 @@
+const SHEET_NAME = 'Sheet1'; // 工作表名
+
+function doGet(e) {
+  const userID = e.parameter.userID;
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] == userID) {
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        userID: userID,
+        points: data[i][1],
+        A: data[i][2],
+        B: data[i][3]
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({ success: false }));
+}
+
+function doPost(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+  const input = JSON.parse(e.postData.contents);
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] == input.userID) {
+      let currentPoints = data[i][1];
+      let currentA = data[i][2];
+      let currentB = data[i][3];
+
+      let deltaA = input.A;
+      let deltaB = input.B;
+
+      let newA = currentA + deltaA;
+      let newB = currentB + deltaB;
+      let newPoints = currentPoints - (deltaA * 10 + deltaB * 5);
+
+      if (newA < 0 || newB < 0 || newPoints < 0) {
+        return ContentService.createTextOutput(JSON.stringify({ success: false, reason: 'Invalid transaction' }));
+      }
+
+      sheet.getRange(i + 1, 2).setValue(newPoints); // Points
+      sheet.getRange(i + 1, 3).setValue(newA);      // A
+      sheet.getRange(i + 1, 4).setValue(newB);      // B
+
+      return ContentService.createTextOutput(JSON.stringify({ success: true }));
+    }
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({ success: false }));
+}
