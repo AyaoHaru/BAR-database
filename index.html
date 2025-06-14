@@ -71,7 +71,7 @@
       fetch(scriptURL, {
         method: 'POST',
         body: JSON.stringify(postData),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
       })
       .then(response => response.json())
       .then(data => {
