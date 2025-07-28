@@ -1,0 +1,16 @@
+{
+  "name": "bar-database",
+  "version": "1.0.0",
+  "description": "Notion Database:https://www.notion.so/23e78abfd47880d39f15c9bcb6a36823?v=23e78abfd4788091ae36000c1976ff83",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
