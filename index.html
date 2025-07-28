@@ -34,8 +34,6 @@
       });
 
       const data = await response.json();
-      console.log("User ID:", data.results[0]);
-      console.log("User properties:", data.results[0].properties);
       
       if (data.results && data.results.length > 0) {
         currentUser = data.results[0];
