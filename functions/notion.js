@@ -1,48 +1,30 @@
-const { Client } = require('@notionhq/client');
+const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
-  try {
-    const { id } = JSON.parse(event.body);
+  const NOTION_API_TOKEN = process.env.NOTION_API_TOKEN;
+  const DATABASE_ID = '23e78abfd47880d39f15c9bcb6a36823';
 
-    const notion = new Client({ auth: process.env.NOTION_API_KEY });
-    const databaseId = '23e78abfd47880d39f15c9bcb6a36823';
+  const body = JSON.parse(event.body);
 
-    // Query the database with a filter on the 'ID' property (assuming it's a text property)
-    const response = await notion.databases.query({
-      database_id: databaseId,
+  const res = await fetch(`https://api.notion.com/v1/databases/${DATABASE_ID}/query`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${NOTION_API_TOKEN}`,
+      'Content-Type': 'application/json',
+      'Notion-Version': '2022-06-28'
+    },
+    body: JSON.stringify({
       filter: {
-        property: 'ID',   // Make sure this matches your Notion property name exactly
-        rich_text: {
-          equals: id
-        }
+        property: 'ID',
+        rich_text: { equals: body.id }
       }
-    });
+    })
+  });
 
-    if (response.results.length === 0) {
-      return {
-        statusCode: 404,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ error: 'No record found for this ID' })
-      };
-    }
-
-    // Extract relevant info from the first matching page
-    const page = response.results[0];
-    // Example: get Stock and Coins from page properties
-    const stock = page.properties.Stock?.rich_text[0]?.plain_text || 'N/A';
-    const coins = page.properties.Coins?.rich_text[0]?.plain_text || 'N/A';
-
-    return {
-      statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ stock, coins })
-    };
-
-  } catch (error) {
-    return {
-      statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ error: error.message })
-    };
-  }
+  const data = await res.json();
+  return {
+    statusCode: 200,
+    headers: { 'Access-Control-Allow-Origin': '*' },
+    body: JSON.stringify(data)
+  };
 };
