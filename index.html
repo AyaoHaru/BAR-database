@@ -27,7 +27,7 @@
       const id = document.getElementById('userID').value.trim();
       if (!id) return alert("Please enter your ID.");
 
-      const response = await fetch('/.netlify/functions/fetch-user', {
+      const response = await fetch('/.netlify/functions/notion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
@@ -52,7 +52,7 @@
       const stockChange = parseInt(document.getElementById('stockChange').value);
       if (isNaN(stockChange) || !currentUser) return alert("Invalid transaction.");
 
-      const response = await fetch('/.netlify/functions/update-user', {
+      const response = await fetch('/.netlify/functions/notion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
