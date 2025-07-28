@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
   const NOTION_API_TOKEN = process.env.NOTION_API_TOKEN;
-  const DATABASE_ID = 'your_database_id';
+  const DATABASE_ID = '23e78abfd47880d39f15c9bcb6a36823';
 
   const body = JSON.parse(event.body);
 
