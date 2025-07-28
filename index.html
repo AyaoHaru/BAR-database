@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stock Transaction</title>
+</head>
+<body>
+  <h1>Buy/Sell Stocks</h1>
+  <form id="stockForm">
+    <label>User ID: <input type="text" id="userId" required /></label><br>
+    <label>Action: 
+      <select id="action">
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+      </select>
+    </label><br>
+    <label>Amount: <input type="number" id="amount" required /></label><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="response"></div>
+
+  <script>
+    document.getElementById('stockForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userId = document.getElementById('userId').value;
+      const action = document.getElementById('action').value;
+      const amount = parseInt(document.getElementById('amount').value, 10);
+
+      const res = await fetch('/api/transaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action, amount })
+      });
+
+      const data = await res.json();
+      document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+    });
+  </script>
+</body>
+</html>
